@@ -40,8 +40,10 @@ class AgentFactory:
         module_name = ".".join(["pyopenagi", "agents", author, name, "agent"])
         class_name = self.snake_to_camel(name)
 
+        # 加载例如 pyopenagi.agents.example.academic_agent.agent
         agent_module = importlib.import_module(module_name)
 
+        # 获取模块中的类
         agent_class = getattr(agent_module, class_name)
         return agent_class
 
@@ -59,6 +61,7 @@ class AgentFactory:
 
         agent_class = self.load_agent_instance(agent_name)
 
+        # 创建 agent 对象，调用例如 agent = AcademicAgent()
         agent = agent_class(
             agent_name = agent_name,
             task_input = task_input,
@@ -66,6 +69,7 @@ class AgentFactory:
             log_mode = self.agent_log_mode
         )
 
+        # 获取agent id
         aid = heapq.heappop(self.aid_pool)
 
         agent.set_aid(aid)
@@ -77,12 +81,14 @@ class AgentFactory:
         return agent
 
     def run_agent(self, agent_name, task_input):
+        # 新建一个agent，设置id，并在current_agents字典中记录
         agent = self.activate_agent(
             agent_name=agent_name,
             task_input=task_input
         )
         # print(task_input)
         output = agent.run()
+        # agent 运行结束，释放资源
         self.deactivate_agent(agent.get_aid())
         return output
 

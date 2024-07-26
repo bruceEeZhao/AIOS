@@ -18,6 +18,9 @@ import importlib
 
 from ..queues.llm_request_queue import LLMRequestQueue
 
+'''
+自定义线程类，相比于Thread基类，增加了额外的信息记录
+'''
 class CustomizedThread(Thread):
     def __init__(self, target, args=()):
         super().__init__()
@@ -32,6 +35,9 @@ class CustomizedThread(Thread):
         super().join()
         return self.result
 
+'''
+Agent 基类
+'''
 class BaseAgent:
     def __init__(self,
                  agent_name,
@@ -192,6 +198,8 @@ class BaseAgent:
             # reinitialize agent status
             agent_process.set_created_time(current_time)
             agent_process.set_response(None)
+
+            # 把 agent_process 对象放入消息队列中
             LLMRequestQueue.add_message(agent_process)
 
             thread.start()
