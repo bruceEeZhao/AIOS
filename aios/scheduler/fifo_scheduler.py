@@ -24,6 +24,7 @@ class FIFOScheduler(BaseScheduler):
                 if there is nothing received in a second, it will raise Empty
                 """
                 # agent_process = self.agent_process_queue.get(block=True, timeout=1)
+                # 从消息队列中获取一个 agent_process 对象
                 agent_process = LLMRequestQueue.get_message()
                 # print("Get the request")
                 agent_process.set_status("executing")
@@ -37,3 +38,4 @@ class FIFOScheduler(BaseScheduler):
         self.llm.address_request(
             agent_process=agent_process
         )
+        # 实际上会调用最终模型中的 process 函数，例如： HfNativeLLM.process()
