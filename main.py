@@ -88,6 +88,8 @@ def main():
     #     "Convert 15000 MXN to Canadian Dollars and find out how much it would be in USD if 1 CAD equals 0.79 USD."
     # )
 
+    # 只是创建workflow, 但实际上不会直接执行 agent, agent的调度由scheduler负责
+    # workflow 的创建是多线程执行的
     academic_agent = agent_thread_pool.submit(
         agent_factory.run_agent,
         "example/academic_agent",
@@ -99,6 +101,7 @@ def main():
     #     "example/rec_agent", "Recommend two movies with groundbreaking visual effects released in the last fifteen years ranked between 1 and 20 with ratings above 8.0."
     # )
 
+    # 只是创建workflow, 但实际上不会直接执行 agent, agent的调度由scheduler负责
     creation_agent = agent_thread_pool.submit(
         agent_factory.run_agent,
         "example/creation_agent", "Create an image of a lush jungle with an ancient temple, evoking a sense of mystery and adventure."
