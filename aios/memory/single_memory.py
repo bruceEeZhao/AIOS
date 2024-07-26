@@ -28,7 +28,7 @@ class UniformedMemoryManager(BaseMemoryManager):
         super().__init__(max_memory_block_size, memory_block_num)
         """ initiate the memory manager in a manner similar to malloc(3) """
         self.memory_blocks = [
-            Memory(max_memory_block_size) for _ in range(memory_block_num)
+            Memory(max_memory_block_size) for _ in range(memory_block_num)  # 申请 memory_block_num 个Memory对象
         ]
         self.free_memory_blocks = [i for i in range(0, memory_block_num)]
         self.thread = Thread(target=self.run)
@@ -97,11 +97,11 @@ class UniformedMemoryManager(BaseMemoryManager):
         return data
 
     def mem_alloc(self, agent_id):
-        memory_block_id = heapq.heappop(self.free_memory_blocks)
-        self.aid_to_memory[agent_id] = {
+        memory_block_id = heapq.heappop(self.free_memory_blocks)  # 获取最小的标号
+        self.aid_to_memory[agent_id] = {                          # 记录memory_blocks和agent_id的对应关系
             "memory_block_id": memory_block_id
         }
 
     def mem_clear(self, agent_id):
-        self.aid_to_mid.pop(agent_id)
-        heapq.heappush(agent_id)
+        self.aid_to_mid.pop(agent_id)                             # 这里应该是写错了，应该是aid_to_memory   --- note
+        heapq.heappush(agent_id)                                  # 这里应该也是写错了，应该是agent_id对应的 memory_block_id   --- note
