@@ -4,6 +4,11 @@ from threading import Thread, Lock, Event
 
 from ..utils.chat_template import Query
 
+'''
+虽然叫做进程，但是并不是操作系统中进程的概念，
+仅仅是记录某个线程的执行状态等
+'''
+
 class AgentProcess:
     def __init__(self,
             agent_name: str,

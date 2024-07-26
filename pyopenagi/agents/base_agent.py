@@ -74,14 +74,18 @@ class BaseAgent:
     def build_system_instruction(self):
         pass
 
+    '''
+    检查所有workflow 列表中的元素是否均合法
+    @param: message 是一个Json字符串
+    '''
     def check_workflow(self, message):
         try:
             # print(f"Workflow message: {message}")
-            workflow = json.loads(message)
-            if not isinstance(workflow, list):
+            workflow = json.loads(message)      # 对Json进行解析
+            if not isinstance(workflow, list):  # 解析后的结果 workflow 应该是一个列表
                 return None
 
-            for step in workflow:
+            for step in workflow:             # 遍历 workflow，列表中的元素是字符串，字符串应该包含特定内容
                 if "message" not in step or "tool_use" not in step:
                     return None
 
@@ -91,7 +95,8 @@ class BaseAgent:
             return None
 
     def automatic_workflow(self):
-        for i in range(self.plan_max_fail_times):
+        for i in range(self.plan_max_fail_times):  #　plan_max_fail_times　定义在子类中（ReactAgent）
+            # 线程运行结束后返回信息
             response, start_times, end_times, waiting_times, turnaround_times = self.get_response(
                 query = Query(
                     messages = self.messages,
@@ -168,16 +173,20 @@ class BaseAgent:
             query,
             temperature=0.0
         ):
+        
+        # self.query_loop 线程执行的任务
         thread = CustomizedThread(target=self.query_loop, args=(query, ))
         thread.start()
         return thread.join()
 
     def query_loop(self, query):
+        # class AgentProcess 对象
         agent_process = self.create_agent_request(query)
 
         completed_response, start_times, end_times, waiting_times, turnaround_times = "", [], [], [], []
 
         while agent_process.get_status() != "done":
+            # 创建一个线程用于监听，即获取 agent_process.response
             thread = Thread(target=self.listen, args=(agent_process, ))
             current_time = time.time()
             # reinitialize agent status
@@ -189,6 +198,7 @@ class BaseAgent:
             thread.join()
 
             completed_response = agent_process.get_response()
+            # 该进程未完成，由于分配的时间到期而 Suspended
             if agent_process.get_status() != "done":
                 self.logger.log(
                     f"Suspended due to the reach of time limit ({agent_process.get_time_limit()}s). Current result is: {completed_response.response_message}\n",
@@ -196,9 +206,11 @@ class BaseAgent:
                 )
             start_time = agent_process.get_start_time()
             end_time = agent_process.get_end_time()
+            # 记录等待时间和周转时间
             waiting_time = start_time - agent_process.get_created_time()
             turnaround_time = end_time - agent_process.get_created_time()
 
+            # 累计等待时间和周转时间
             start_times.append(start_time)
             end_times.append(end_time)
             waiting_times.append(waiting_time)

@@ -245,6 +245,7 @@ class HfNativeLLM(BaseLLM):
             beam_attention_mask = torch.cat([beam_attention_mask[beam_indices], torch.ones_like(token_indices).unsqueeze(-1)], dim=-1)
             beam_scores = top_scores
 
+            # 分配的时间片到了，停止该模型，并创建快照
             # Check for stopping criteria
             if timestamp is not None and time.time() - start_time >= timestamp:
                 idx = step
